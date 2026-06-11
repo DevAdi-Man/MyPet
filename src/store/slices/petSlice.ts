@@ -9,6 +9,8 @@ export interface PetState {
   level: number;
 
   lastOpenAt: number;
+
+  musicEnabled: boolean;
 }
 
 const initialState: PetState = {
@@ -16,16 +18,25 @@ const initialState: PetState = {
   energy: 100,
   happiness: 100,
 
-  xp: 100,
-  level: 100,
+  xp: 0,
+  level: 0,
 
   lastOpenAt: Date.now(),
+
+  musicEnabled: true,
 };
 
 const petSlice = createSlice({
   name: "pet",
   initialState,
   reducers: {
+    toggleMusic: (state) => {
+      state.musicEnabled = !state.musicEnabled;
+    },
+
+    setMusicEnabled: (state, action: PayloadAction<boolean>) => {
+      state.musicEnabled = action.payload;
+    },
     feedPet: (state) => {
       state.hunger = Math.min(state.hunger + 20, 100);
       state.xp += 5;
@@ -68,6 +79,8 @@ export const {
   updateLastOpenAt,
   levelUp,
   resetPet,
+  toggleMusic,
+  setMusicEnabled,
 } = petSlice.actions;
 
 export default petSlice.reducer;

@@ -1,11 +1,13 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { HomeScreen } from "../screens/HomeScreen";
 import { createStaticNavigation } from "@react-navigation/native";
+import { GameScreen } from "@screens/index";
 
 const RootStack = createNativeStackNavigator({
   screens: {
-    Home: HomeScreen,
+    Home: GameScreen,
   },
+  screenOptions: { headerShown: false },
+  animation: "slide_from_right",
 });
 
 type RootStackType = typeof RootStack;

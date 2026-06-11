@@ -3,14 +3,16 @@
     "name": "MyPet",
     "slug": "MyPet",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "permission": ["VIBRATE"],
+      "permissions": [
+        "VIBRATE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -21,6 +23,24 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone.",
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false
+        }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": true,
+          "hidden": true,
+          "style": "light"
+        }
+      ]
+    ]
   }
 }
