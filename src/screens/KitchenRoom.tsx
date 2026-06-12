@@ -2,17 +2,18 @@ import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import { RoomButton } from "@components/RoomButton";
 import { Room } from "src/types/room";
 import { Pet } from "@components/Pet";
+import { ProgressBar } from "@components/ProgressBar";
+import { SkiaHeart } from "@components/SkiaHeart";
 import { Foods, PLATES } from "src/constants/foods";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  SharedValue,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { scheduleOnRN } from "react-native-worklets";
-import { useAppDispatch } from "@hooks/reducerHook";
+import { useAppDispatch, useAppSelector } from "@hooks/reducerHook";
 import { useAudioPlayer } from "expo-audio";
 import { feedPet } from "@store/slices/petSlice";
 
@@ -95,17 +96,90 @@ const FoodItem = ({
   );
 };
 
+interface Heart {
+  id: string;
+  x: number;
+  y: number;
+  size: number;
+}
+
+const HeartsAnimation = ({ visible }: { visible: boolean }) => {
+  const [hearts, setHearts] = useState<Heart[]>([]);
+
+  useEffect(() => {
+    if (visible) {
+      const newHearts: Heart[] = Array.from({ length: 12 }).map(
+        (_, index) => ({
+          id: `heart-${Date.now()}-${index}`,
+          x: Math.random() * 300,
+          y: Math.random() * 400,
+          size: 30 + Math.random() * 50,
+        })
+      );
+      setHearts(newHearts);
+
+      const timer = setTimeout(() => {
+        setHearts([]);
+      }, 2100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
+  if (!visible || hearts.length === 0) return null;
+
+  return (
+    <View
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+      }}
+    >
+      {hearts.map((heart) => (
+        <SkiaHeart key={heart.id} x={heart.x} y={heart.y} size={heart.size} color="#FF6B9D" />
+      ))}
+    </View>
+  );
+};
+
 export const KitchenRoom = () => {
   const [foods, setFoods] = useState(getRandomFoods());
+  const [showHearts, setShowHearts] = useState(false);
   const dispatch = useAppDispatch();
+  const hunger = useAppSelector((state) => state.pet.hunger);
   const foodsRef = useRef(foods);
   foodsRef.current = foods;
 
   const eatPlayer = useAudioPlayer(require("@assets/sound/eating.mp3"));
+  const barkPlayer = useAudioPlayer(require("@assets/sound/FriendlyBark.mp3"));
+
   const playEatSound = useCallback(() => {
     eatPlayer.seekTo(0);
     eatPlayer.play();
   }, [eatPlayer]);
+
+  const playBarkSound = useCallback(() => {
+    barkPlayer.seekTo(0);
+    barkPlayer.play();
+  }, [barkPlayer]);
+
+  // Trigger hearts animation and bark when hunger reaches 100
+  useEffect(() => {
+    if (hunger === 100) {
+      setShowHearts(true);
+      playBarkSound();
+
+      const timer = setTimeout(() => {
+        setShowHearts(false);
+      }, 2200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hunger, playBarkSound]);
 
   const handleEat = useCallback(
     (plateIndex: number) => {
@@ -134,6 +208,10 @@ export const KitchenRoom = () => {
       resizeMode="cover"
       style={styles.container}
     >
+      <HeartsAnimation visible={showHearts} />
+      <View style={styles.progressBarContainer}>
+        <ProgressBar value={hunger} />
+      </View>
       <RoomButton room={Room.HOME} />
       <Pet />
       <ImageBackground
@@ -175,6 +253,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
+  },
+  progressBarContainer: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 10,
   },
   table: {
     position: "absolute",

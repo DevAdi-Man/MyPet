@@ -14,7 +14,7 @@ export interface PetState {
 }
 
 const initialState: PetState = {
-  hunger: 100,
+  hunger: 1,
   energy: 100,
   happiness: 100,
 
