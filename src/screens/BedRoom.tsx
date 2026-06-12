@@ -11,7 +11,7 @@ export const BedRoom = () => {
       resizeMode="cover"
     >
       <RoomButton room={Room.HOME} />
-      <ProgressBar />
+      <ProgressBar value={70} />
     </ImageBackground>
   );
 };
