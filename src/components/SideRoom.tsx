@@ -1,18 +1,36 @@
-import { Pressable, View, StyleSheet } from "react-native";
+import { Pressable, View, StyleSheet, Text } from "react-native";
 import Carrot from "@assets/carrot.svg";
 import { Room } from "src/types/room";
 import Shower from "@assets/shower.svg";
 import Bed from "@assets/bed.svg";
+import { useAppSelector } from "@hooks/reducerHook";
 interface SideRoomProps {
   moveToRoom: (room: Room) => void;
 }
-const roomData = [
-  Room.KITCHEN,
-  Room.BATHROOM,
-  Room.BEDROOM,
-];
-
+const roomData = [Room.KITCHEN, Room.BATHROOM, Room.BEDROOM];
 export const SideRoom = ({ moveToRoom }: SideRoomProps) => {
+  const { hunger, happiness, energy } = useAppSelector((state) => state.pet);
+  const getRoomEmoji = (room: Room) => {
+    switch (room) {
+      case Room.KITCHEN:
+        if (hunger <= 20) return "😭";
+        if (hunger <= 40) return "🥺";
+        return null;
+
+      case Room.BATHROOM:
+        if (happiness <= 20) return "😢";
+        if (happiness <= 40) return "🙁";
+        return null;
+
+      case Room.BEDROOM:
+        if (energy <= 20) return "💤";
+        if (energy <= 40) return "😴";
+        return null;
+
+      default:
+        return null;
+    }
+  };
   return (
     <View
       style={{
@@ -23,20 +41,30 @@ export const SideRoom = ({ moveToRoom }: SideRoomProps) => {
         gap: 16,
       }}
     >
-      {roomData.map((room) => (
-        <Pressable
-          key={room}
-          onPress={() => moveToRoom(room)}
-          style={({ pressed }) => [
-            styles.carrotButton,
-            pressed && styles.pressed,
-          ]}
-        >
+      {roomData.map((room) => {
+        const emoji = getRoomEmoji(room);
+
+        return (
+          <Pressable
+            key={room}
+            onPress={() => moveToRoom(room)}
+            style={({ pressed }) => [
+              styles.carrotButton,
+              pressed && styles.pressed,
+            ]}
+          >
             {room === Room.KITCHEN && <Carrot />}
             {room === Room.BATHROOM && <Shower />}
             {room === Room.BEDROOM && <Bed />}
-        </Pressable>
-      ))}
+
+            {emoji && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{emoji}</Text>
+              </View>
+            )}
+          </Pressable>
+        );
+      })}
     </View>
   );
 };
@@ -54,5 +82,14 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.82,
     transform: [{ scale: 0.96 }],
+  },
+  badge: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+  },
+
+  badgeText: {
+    fontSize: 24,
   },
 });

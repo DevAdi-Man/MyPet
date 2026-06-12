@@ -20,15 +20,15 @@ export const useStatDecay = () => {
         applyDelay({
           hungerDecay: Math.max(
             pet.hunger - HUNGER_DECAY_RATE * elapsedSeconds,
-            0
+           1 
           ),
           energyDecay: Math.max(
             pet.energy - ENERGY_DECAY_RATE * elapsedSeconds,
-            0
+           1 
           ),
           happinessDecay: Math.max(
             pet.happiness - HAPPINESS_DECAY_RATE * elapsedSeconds,
-            0
+            1
           ),
         })
       );
@@ -44,15 +44,15 @@ export const useStatDecay = () => {
         applyDelay({
           hungerDecay: Math.max(
             pet.hunger - HUNGER_DECAY_RATE * 10,
-            0
+            1
           ),
           energyDecay: Math.max(
             pet.energy - ENERGY_DECAY_RATE * 10,
-            0
+            1
           ),
           happinessDecay: Math.max(
             pet.happiness - HAPPINESS_DECAY_RATE * 10,
-            0
+            1
           ),
         })
       );
