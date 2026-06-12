@@ -12,6 +12,7 @@
     "expo-audio": "~56.0.11",
     "expo-haptics": "~56.0.3",
     "expo-navigation-bar": "~56.0.3",
+    "expo-screen-orientation": "~56.0.5",
     "expo-status-bar": "~56.0.4",
     "lottie-react-native": "^7.3.8",
     "react": "19.2.3",

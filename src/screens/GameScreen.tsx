@@ -1,18 +1,20 @@
 import React, { FC } from "react";
 import { useSelector } from "react-redux";
 import { useRoom } from "@hooks/useRoom";
-import { usePetAudio } from "@hooks/usePetAudio";
 import { HomeRoom } from "./HomeRoom";
 import { Room } from "src/types/room";
 import { KitchenRoom } from "./KitchenRoom";
 import { RoomTransition } from "@components/RoomTransition";
 import { RootState } from "@store/index";
+import { useBackgroundMusic } from "@hooks/useBackgroundMusic";
+import { BedRoom } from "./BedRoom";
+import { BathRoom } from "./BathRoom";
 
 const rooms: Partial<Record<Room, FC>> = {
   [Room.HOME]: HomeRoom,
   [Room.KITCHEN]: KitchenRoom,
-  // [Room.BATHROOM]: BathroomRoom,
-  // [Room.BEDROOM]: BedroomRoom,
+  [Room.BATHROOM]: BathRoom,
+  [Room.BEDROOM]: BedRoom,
 };
 
 export const GameScreen = () => {
@@ -22,7 +24,7 @@ export const GameScreen = () => {
   );
   
   // Keep music running across all rooms
-  usePetAudio(musicEnabled);
+  useBackgroundMusic(musicEnabled)
 
   const CurrentRoom = rooms[currentRoom];
 

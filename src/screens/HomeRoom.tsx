@@ -37,7 +37,7 @@ export const HomeRoom = () => {
   const { changeRoomWithTransition } = useRoomTransition();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { playBark, playClick } = usePetAudio(musicEnabled);
+  const { playBark, playClick } = usePetAudio();
   const { trigger } = usePetHaptics();
   const { panResponder, starAnimationRef, isDraggingDog } =
     useDogInteraction(playBark);

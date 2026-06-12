@@ -1,21 +1,13 @@
 import { useAudioPlayer } from "expo-audio";
-import { useEffect } from "react";
 
-export const usePetAudio = (musicEnabled: boolean) => {
-  const musicPlayer = useAudioPlayer(require("@assets/sound/BackGround.mp3"));
-  const clickPlayer = useAudioPlayer(require("@assets/sound/ClickButton.mp3"));
-  const barkPlayer = useAudioPlayer(require("@assets/sound/FriendlyBark.mp3"));
+export const usePetAudio = () => {
+  const clickPlayer = useAudioPlayer(
+    require("@assets/sound/ClickButton.mp3")
+  );
 
-  useEffect(() => {
-    musicPlayer.loop = true;
-
-    if (musicEnabled) {
-      musicPlayer.volume = 0.35;
-      musicPlayer.play();
-    } else {
-      musicPlayer.pause();
-    }
-  }, [musicEnabled, musicPlayer]);
+  const barkPlayer = useAudioPlayer(
+    require("@assets/sound/FriendlyBark.mp3")
+  );
 
   const playClick = () => {
     clickPlayer.seekTo(0);
@@ -27,5 +19,8 @@ export const usePetAudio = (musicEnabled: boolean) => {
     barkPlayer.play();
   };
 
-  return { playClick, playBark };
+  return {
+    playClick,
+    playBark,
+  };
 };

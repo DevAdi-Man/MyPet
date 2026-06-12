@@ -37,16 +37,16 @@ const petSlice = createSlice({
     setMusicEnabled: (state, action: PayloadAction<boolean>) => {
       state.musicEnabled = action.payload;
     },
-    feedPet: (state) => {
-      state.hunger = Math.min(state.hunger + 20, 100);
+    feedPet: (state, action: PayloadAction<number>) => {
+      state.hunger = Math.min(state.hunger + action.payload, 100);
       state.xp += 5;
     },
-    playWithPet: (state) => {
-      state.happiness = Math.min(state.happiness + 20, 100);
+    playWithPet: (state, action: PayloadAction<number>) => {
+      state.happiness = Math.min(state.happiness + action.payload, 100);
       state.xp += 5;
     },
-    sleepPet: (state) => {
-      state.energy = Math.min(state.energy + 20, 100);
+    sleepPet: (state, action: PayloadAction<number>) => {
+      state.energy = Math.min(state.energy + action.payload, 100);
       state.xp += 5;
     },
     applyDelay: (

@@ -2,6 +2,7 @@ import { Pressable, View, StyleSheet } from "react-native";
 import Carrot from "@assets/carrot.svg";
 import { Room } from "src/types/room";
 import Shower from "@assets/shower.svg";
+import Bed from "@assets/bed.svg";
 interface SideRoomProps {
   moveToRoom: (room: Room) => void;
 }
@@ -33,7 +34,7 @@ export const SideRoom = ({ moveToRoom }: SideRoomProps) => {
         >
             {room === Room.KITCHEN && <Carrot />}
             {room === Room.BATHROOM && <Shower />}
-            {room === Room.BEDROOM && <Carrot />}
+            {room === Room.BEDROOM && <Bed />}
         </Pressable>
       ))}
     </View>

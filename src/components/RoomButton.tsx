@@ -1,3 +1,5 @@
+import { usePetAudio } from "@hooks/usePetAudio";
+import { usePetHaptics } from "@hooks/usePetHaptics";
 import { useRoom } from "@hooks/useRoom";
 import { Pressable, StyleSheet, View } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -8,10 +10,17 @@ interface RoomButtonProps {
 }
 export const RoomButton = ({ room }: RoomButtonProps) => {
   const { changeRoom } = useRoom();
+  const { playClick } = usePetAudio();
+  const { trigger } = usePetHaptics();
+  const handlePress = () => {
+    playClick();
+    trigger();
+    changeRoom(room);
+  }
   return (
     <Pressable
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
-      onPress={() => changeRoom(room)}
+      onPress={handlePress}
     >
       <View style={styles.iconWrap}>
         <FontAwesome name="close" size={24} color="#17251F" />

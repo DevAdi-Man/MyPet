@@ -7,7 +7,8 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": true
     },
     "android": {
       "permissions": [
@@ -39,6 +40,12 @@
           "enforceContrast": true,
           "hidden": true,
           "style": "light"
+        }
+      ],
+       [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "LANDSCAPE"
         }
       ]
     ]

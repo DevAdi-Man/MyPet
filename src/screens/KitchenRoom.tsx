@@ -3,21 +3,26 @@ import { RoomButton } from "@components/RoomButton";
 import { Room } from "src/types/room";
 import { Pet } from "@components/Pet";
 import { Foods, PLATES } from "src/constants/foods";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  SharedValue,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { scheduleOnRN } from "react-native-worklets";
+import { useAppDispatch } from "@hooks/reducerHook";
+import { useAudioPlayer } from "expo-audio";
+import { feedPet } from "@store/slices/petSlice";
 
 const getRandomFoods = () => {
   return [...Foods].sort(() => Math.random() - 0.5).slice(0, 4);
 };
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const MOUTH = {
-  x: 190,
-  y: 260,
+  x: 405 + 32,
+  y: 0 + 32,
   radius: 60,
 };
 const FoodItem = ({
@@ -45,7 +50,6 @@ const FoodItem = ({
     })
     .onFinalize(() => {
       const foodX = PLATES[plateIndex].left + transitionX.value + 35;
-
       const foodY = PLATES[plateIndex].top + transitionY.value + 35;
 
       const dx = foodX - MOUTH.x;
@@ -54,7 +58,9 @@ const FoodItem = ({
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < MOUTH.radius) {
-        onEat(plateIndex);
+        transitionX.value = withSpring(MOUTH.x - PLATES[plateIndex].left - 35);
+        transitionY.value = withSpring(MOUTH.y - PLATES[plateIndex].top - 35);
+        scheduleOnRN(onEat, plateIndex);
       } else {
         transitionX.value = withSpring(0);
         transitionY.value = withSpring(0);
@@ -91,11 +97,37 @@ const FoodItem = ({
 
 export const KitchenRoom = () => {
   const [foods, setFoods] = useState(getRandomFoods());
-  const mouthRef = useRef<View>(null);
+  const dispatch = useAppDispatch();
+  const foodsRef = useRef(foods);
+  foodsRef.current = foods;
 
-  const handleEat = (plateIndex: number) => {
-    console.log("food eaten", plateIndex);
-  };
+  const eatPlayer = useAudioPlayer(require("@assets/sound/eating.mp3"));
+  const playEatSound = useCallback(() => {
+    eatPlayer.seekTo(0);
+    eatPlayer.play();
+  }, [eatPlayer]);
+
+  const handleEat = useCallback(
+    (plateIndex: number) => {
+      playEatSound(); 
+
+      const food = foodsRef.current[plateIndex]; 
+      if (food) {
+        dispatch(feedPet(food.hungerValue ?? 20));
+      }
+
+      setFoods((prev) => {
+        const newFoods = [...prev];
+        newFoods[plateIndex] = null as any;
+        const allEaten = newFoods.every((f) => f === null);
+        if (allEaten) {
+          setTimeout(() => setFoods(getRandomFoods()), 1000);
+        }
+        return newFoods;
+      });
+    },
+    [dispatch, playEatSound], 
+  );
   return (
     <ImageBackground
       source={require("@assets/kitchen.png")}
@@ -104,33 +136,35 @@ export const KitchenRoom = () => {
     >
       <RoomButton room={Room.HOME} />
       <Pet />
-      <View
-        ref={mouthRef}
-        style={{
-          position: "absolute",
-          width: 65,
-          height: 65,
-          top: "36%",
-          left: "46.5%",
-          borderRadius: 1000,
-          // debug
-          backgroundColor: "rgba(255,0,0,0.3)",
-        }}
-      />
       <ImageBackground
         source={require("@assets/table.png")}
         resizeMode="cover"
         style={styles.table}
       >
+        <View
+          style={{
+            position: "absolute",
+            width: 65,
+            height: 65,
+            top: 0,
+            left: 405,
+            borderRadius: 1000,
+            // debug
+            // backgroundColor: "rgba(255,0,0,0.3)",
+          }}
+        />
         <View style={styles.tableContainer}>
-          {foods.map((food, index) => (
-            <FoodItem
-              key={food.id + index}
-              food={food}
-              plateIndex={index}
-              onEat={handleEat}
-            />
-          ))}
+          {foods.map((food, index) => {
+            if (!food) return null;
+            return (
+              <FoodItem
+                key={food.id + index}
+                food={food}
+                plateIndex={index}
+                onEat={handleEat}
+              />
+            );
+          })}
         </View>
       </ImageBackground>
     </ImageBackground>
